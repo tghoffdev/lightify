@@ -329,6 +329,29 @@ header h1 {
   flex: 1;
 }
 
+.btn-sensor {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: transparent;
+  color: var(--success);
+  border: 2px solid var(--success);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-sensor:hover {
+  background: var(--success-dim);
+  box-shadow: 0 0 15px var(--success-dim);
+}
+
+.btn-sensor:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Dashboard */
 .dashboard {
   display: grid;
@@ -1111,4 +1134,147 @@ footer {
   color: var(--accent);
   border-color: var(--accent);
   box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Connection Section */
+.connection-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.connection-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.connection-section h4 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.status-indicator.small {
+  width: 8px;
+  height: 8px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mode-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.mode-toggle label.active {
+  color: var(--accent);
+}
+
+.mode-toggle input[type="radio"] {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.mode-toggle input[type="radio"]:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.local-connect,
+.relay-connect {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.relay-connect input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.relay-connect input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.relay-connect input::placeholder {
+  color: var(--text-dim);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.status-message {
+  font-size: 0.7rem;
+  color: var(--warning);
+  text-align: center;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+.connected-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.connection-status {
+  font-size: 0.75rem;
+  color: var(--success);
+}
+
+/* Disconnected Notice (for lights list area) */
+.disconnected-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.disconnected-notice .disconnected-icon {
+  font-size: 1.5rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.disconnected-notice .disconnected-title {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.disconnected-notice .disconnected-hint {
+  font-size: 0.65rem;
+  color: var(--text-dim);
 }

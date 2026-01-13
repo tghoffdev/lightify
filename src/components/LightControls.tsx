@@ -31,6 +31,7 @@ interface LightControlsProps {
   colorMode: ColorMode;
   colorTemp: number; // mirek value
   isAutoMode: boolean;
+  isConnected: boolean;
   onToggleLight: (lightId: string) => void;
   onSelectAll: () => void;
   onToggleAutoMode: () => void;
@@ -39,7 +40,6 @@ interface LightControlsProps {
   onSaturationChange: (value: number) => void;
   onColorModeChange: (mode: ColorMode) => void;
   onColorTempChange: (temp: number) => void;
-  onDisconnect: () => void;
 }
 
 export function LightControls({
@@ -51,6 +51,7 @@ export function LightControls({
   colorMode,
   colorTemp,
   isAutoMode,
+  isConnected,
   onToggleLight,
   onSelectAll,
   onToggleAutoMode,
@@ -59,7 +60,6 @@ export function LightControls({
   onSaturationChange,
   onColorModeChange,
   onColorTempChange,
-  onDisconnect,
 }: LightControlsProps) {
   const hueBrightnessPercent = Math.round((hueBrightness / 254) * 100);
   // Convert Hue's 0-65535 range to CSS hue 0-360
@@ -78,38 +78,45 @@ export function LightControls({
       <div className="panel-header">
         <h3>Illumination Control</h3>
         <div className="status-indicator" style={{
-          background: 'var(--success)',
-          boxShadow: '0 0 8px var(--success)'
+          background: isConnected ? 'var(--success)' : 'var(--text-dim)',
+          boxShadow: isConnected ? '0 0 8px var(--success)' : 'none'
         }} />
       </div>
       <div className="panel-content">
         <div className="section-header">
           <h3>Active Units</h3>
-          <button onClick={onDisconnect} className="btn-text">
-            Disconnect
-          </button>
         </div>
 
-        <div className="lights-list">
-          {lights.map(light => (
-            <label key={light.id} className="light-item">
-              <input
-                type="checkbox"
-                checked={selectedLightIds.includes(light.id)}
-                onChange={() => onToggleLight(light.id)}
-              />
-              <span className="light-name">{light.name}</span>
-              <span className={`light-status ${light.state.reachable ? 'online' : 'offline'}`}>
-                {light.state.reachable ? 'Online' : 'Offline'}
-              </span>
-            </label>
-          ))}
-        </div>
+        {!isConnected ? (
+          <div className="disconnected-notice">
+            <div className="disconnected-icon">&#9889;</div>
+            <p className="disconnected-title">No Hue Bridge Connected</p>
+            <p className="disconnected-hint">Connect via the left panel to control your lights</p>
+          </div>
+        ) : (
+          <>
+            <div className="lights-list">
+              {lights.map(light => (
+                <label key={light.id} className="light-item">
+                  <input
+                    type="checkbox"
+                    checked={selectedLightIds.includes(light.id)}
+                    onChange={() => onToggleLight(light.id)}
+                  />
+                  <span className="light-name">{light.name}</span>
+                  <span className={`light-status ${light.state.reachable ? 'online' : 'offline'}`}>
+                    {light.state.reachable ? 'Online' : 'Offline'}
+                  </span>
+                </label>
+              ))}
+            </div>
 
-        {lights.length > 1 && (
-          <button onClick={onSelectAll} className="btn-text">
-            Select All Units
-          </button>
+            {lights.length > 1 && (
+              <button onClick={onSelectAll} className="btn-text">
+                Select All Units
+              </button>
+            )}
+          </>
         )}
 
         <div className="meter" style={{ marginTop: '1.5rem' }}>
@@ -238,8 +245,8 @@ export function LightControls({
             max="254"
             value={hueBrightness}
             onChange={e => onBrightnessChange(Number(e.target.value))}
-            disabled={isAutoMode}
-            style={{ opacity: isAutoMode ? 0.5 : 1 }}
+            disabled={isAutoMode || !isConnected}
+            style={{ opacity: isAutoMode || !isConnected ? 0.5 : 1 }}
           />
         </div>
       </div>

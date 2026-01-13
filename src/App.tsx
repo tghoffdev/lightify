@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBrightness } from './hooks/useBrightness';
 import { useHueBridge } from './hooks/useHueBridge';
-import { HueSetup } from './components/HueSetup';
 import { BrightnessSensor } from './components/BrightnessSensor';
 import { LightControls } from './components/LightControls';
 
@@ -101,52 +100,48 @@ function App() {
       </header>
 
       <main>
-        {!isConnected ? (
-          <HueSetup
-            status={hue.status}
-            error={hue.error}
+        <div className="dashboard">
+          <BrightnessSensor
+            brightness={brightness.brightness}
+            isActive={brightness.isActive}
+            isGrabbing={brightness.isGrabbing}
+            error={brightness.error}
+            videoRef={brightness.videoRef}
+            onStart={brightness.start}
+            onStop={brightness.stop}
+            onGrabOnce={brightness.grabOnce}
+            // Hue connection props
+            hueStatus={hue.status}
+            hueError={hue.error}
             connectionMode={hue.connectionMode}
             relayConfig={hue.relayConfig}
+            bridgeIp={hue.bridgeIp}
             onConnect={hue.connect}
             onConnectWithRelay={hue.connectWithRelay}
             onSetConnectionMode={hue.setConnectionMode}
-            onConfigureRelay={hue.configureRelay}
-            onClearRelay={hue.clearRelay}
+            onDisconnect={hue.disconnect}
           />
-        ) : (
-          <div className="dashboard">
-            <BrightnessSensor
-              brightness={brightness.brightness}
-              isActive={brightness.isActive}
-              isGrabbing={brightness.isGrabbing}
-              error={brightness.error}
-              videoRef={brightness.videoRef}
-              onStart={brightness.start}
-              onStop={brightness.stop}
-              onGrabOnce={brightness.grabOnce}
-            />
 
-            <LightControls
-              lights={hue.lights}
-              selectedLightIds={hue.selectedLightIds}
-              hueBrightness={hueBrightness}
-              hueColor={hueColor}
-              saturation={saturation}
-              colorMode={colorMode}
-              colorTemp={colorTemp}
-              isAutoMode={isAutoMode}
-              onToggleLight={hue.toggleLightSelection}
-              onSelectAll={hue.selectAllLights}
-              onToggleAutoMode={() => setIsAutoMode(!isAutoMode)}
-              onBrightnessChange={handleBrightnessChange}
-              onHueColorChange={setHueColor}
-              onSaturationChange={setSaturation}
-              onColorModeChange={setColorMode}
-              onColorTempChange={setColorTemp}
-              onDisconnect={hue.disconnect}
-            />
-          </div>
-        )}
+          <LightControls
+            lights={hue.lights}
+            selectedLightIds={hue.selectedLightIds}
+            hueBrightness={hueBrightness}
+            hueColor={hueColor}
+            saturation={saturation}
+            colorMode={colorMode}
+            colorTemp={colorTemp}
+            isAutoMode={isAutoMode}
+            isConnected={isConnected}
+            onToggleLight={hue.toggleLightSelection}
+            onSelectAll={hue.selectAllLights}
+            onToggleAutoMode={() => setIsAutoMode(!isAutoMode)}
+            onBrightnessChange={handleBrightnessChange}
+            onHueColorChange={setHueColor}
+            onSaturationChange={setSaturation}
+            onColorModeChange={setColorMode}
+            onColorTempChange={setColorTemp}
+          />
+        </div>
       </main>
 
       <footer>
