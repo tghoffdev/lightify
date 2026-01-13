@@ -2,20 +2,30 @@ import { useState, useEffect, useRef } from 'react';
 import { useBrightness } from './hooks/useBrightness';
 import { useHueBridge } from './hooks/useHueBridge';
 import { HueSetup } from './components/HueSetup';
-import { WebcamPreview } from './components/WebcamPreview';
+import { BrightnessSensor } from './components/BrightnessSensor';
 import { LightControls } from './components/LightControls';
+
+export type ColorMode = 'spectrum' | 'incandescent';
 
 function App() {
   const [isAutoMode, setIsAutoMode] = useState(true);
   const [hueBrightness, setHueBrightness] = useState(127);
   const [hueColor, setHueColor] = useState(0); // 0-65535
   const [saturation, setSaturation] = useState(254); // 0-254
+  const [colorMode, setColorMode] = useState<ColorMode>('spectrum');
+  const [colorTemp, setColorTemp] = useState(370); // mirek: ~2700K warm white
 
   const brightness = useBrightness({ sampleInterval: 500, smoothingFactor: 0.3 });
   const hue = useHueBridge();
 
   // Track last sent values to avoid redundant updates
-  const lastUpdate = useRef({ bri: hueBrightness, hue: hueColor, sat: saturation });
+  const lastUpdate = useRef({
+    bri: hueBrightness,
+    hue: hueColor,
+    sat: saturation,
+    ct: colorTemp,
+    mode: colorMode,
+  });
 
   // Auto-adjust lights when ambient brightness changes
   useEffect(() => {
@@ -34,27 +44,45 @@ function App() {
     if (hue.status !== 'connected') return;
 
     // Check if anything changed
-    if (
-      lastUpdate.current.bri === hueBrightness &&
-      lastUpdate.current.hue === hueColor &&
-      lastUpdate.current.sat === saturation
-    ) {
+    const current = lastUpdate.current;
+    const modeChanged = current.mode !== colorMode;
+    const briChanged = current.bri !== hueBrightness;
+    const hueChanged = colorMode === 'spectrum' && (current.hue !== hueColor || current.sat !== saturation);
+    const ctChanged = colorMode === 'incandescent' && current.ct !== colorTemp;
+
+    if (!modeChanged && !briChanged && !hueChanged && !ctChanged) {
       return;
     }
 
-    lastUpdate.current = { bri: hueBrightness, hue: hueColor, sat: saturation };
+    lastUpdate.current = {
+      bri: hueBrightness,
+      hue: hueColor,
+      sat: saturation,
+      ct: colorTemp,
+      mode: colorMode,
+    };
 
     const timeout = setTimeout(() => {
-      hue.setLightsState({
-        on: true,
-        bri: hueBrightness,
-        hue: hueColor,
-        sat: saturation,
-      });
+      if (colorMode === 'spectrum') {
+        // HSV color mode
+        hue.setLightsState({
+          on: true,
+          bri: hueBrightness,
+          hue: hueColor,
+          sat: saturation,
+        });
+      } else {
+        // Color temperature mode
+        hue.setLightsState({
+          on: true,
+          bri: hueBrightness,
+          ct: colorTemp,
+        });
+      }
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [hueBrightness, hueColor, saturation, hue.status, hue.setLightsState]);
+  }, [hueBrightness, hueColor, saturation, colorTemp, colorMode, hue.status, hue.setLightsState]);
 
   // Manual brightness change (when not in auto mode)
   const handleBrightnessChange = (value: number) => {
@@ -77,17 +105,25 @@ function App() {
           <HueSetup
             status={hue.status}
             error={hue.error}
+            connectionMode={hue.connectionMode}
+            relayConfig={hue.relayConfig}
             onConnect={hue.connect}
+            onConnectWithRelay={hue.connectWithRelay}
+            onSetConnectionMode={hue.setConnectionMode}
+            onConfigureRelay={hue.configureRelay}
+            onClearRelay={hue.clearRelay}
           />
         ) : (
           <div className="dashboard">
-            <WebcamPreview
-              videoRef={brightness.videoRef}
+            <BrightnessSensor
               brightness={brightness.brightness}
               isActive={brightness.isActive}
+              isGrabbing={brightness.isGrabbing}
               error={brightness.error}
+              videoRef={brightness.videoRef}
               onStart={brightness.start}
               onStop={brightness.stop}
+              onGrabOnce={brightness.grabOnce}
             />
 
             <LightControls
@@ -96,6 +132,8 @@ function App() {
               hueBrightness={hueBrightness}
               hueColor={hueColor}
               saturation={saturation}
+              colorMode={colorMode}
+              colorTemp={colorTemp}
               isAutoMode={isAutoMode}
               onToggleLight={hue.toggleLightSelection}
               onSelectAll={hue.selectAllLights}
@@ -103,6 +141,8 @@ function App() {
               onBrightnessChange={handleBrightnessChange}
               onHueColorChange={setHueColor}
               onSaturationChange={setSaturation}
+              onColorModeChange={setColorMode}
+              onColorTempChange={setColorTemp}
               onDisconnect={hue.disconnect}
             />
           </div>
@@ -113,7 +153,7 @@ function App() {
         <p>
           {isConnected && hue.bridgeIp && (
             <span className="connected-status">
-              {hue.bridgeIp}
+              {hue.connectionMode === 'relay' ? '[RELAY] ' : ''}{hue.bridgeIp}
             </span>
           )}
         </p>

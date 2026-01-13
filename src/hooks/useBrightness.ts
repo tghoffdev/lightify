@@ -8,10 +8,12 @@ interface UseBrightnessOptions {
 interface UseBrightnessReturn {
   brightness: number; // 0-255
   isActive: boolean;
+  isGrabbing: boolean;
   error: string | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   start: () => Promise<void>;
   stop: () => void;
+  grabOnce: () => Promise<void>;
 }
 
 export function useBrightness(options: UseBrightnessOptions = {}): UseBrightnessReturn {
@@ -19,6 +21,7 @@ export function useBrightness(options: UseBrightnessOptions = {}): UseBrightness
 
   const [brightness, setBrightness] = useState(128);
   const [isActive, setIsActive] = useState(false);
+  const [isGrabbing, setIsGrabbing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -112,6 +115,65 @@ export function useBrightness(options: UseBrightnessOptions = {}): UseBrightness
     setIsActive(false);
   }, []);
 
+  const grabOnce = useCallback(async () => {
+    try {
+      setError(null);
+      setIsGrabbing(true);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: 640, height: 480 },
+      });
+
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = stream;
+        await video.play();
+
+        // Wait for video to be ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Take single brightness reading (direct, no smoothing)
+        if (!canvasRef.current) {
+          canvasRef.current = document.createElement('canvas');
+        }
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        if (ctx && video.readyState === video.HAVE_ENOUGH_DATA) {
+          const width = 64;
+          const height = 48;
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(video, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const data = imageData.data;
+
+          let totalBrightness = 0;
+          const pixelCount = data.length / 4;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            totalBrightness += 0.299 * r + 0.587 * g + 0.114 * b;
+          }
+
+          const rawBrightness = totalBrightness / pixelCount;
+          setBrightness(Math.round(rawBrightness));
+        }
+
+        // Stop camera immediately
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to access camera';
+      setError(message);
+    } finally {
+      setIsGrabbing(false);
+    }
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -122,9 +184,11 @@ export function useBrightness(options: UseBrightnessOptions = {}): UseBrightness
   return {
     brightness,
     isActive,
+    isGrabbing,
     error,
     videoRef,
     start,
     stop,
+    grabOnce,
   };
 }

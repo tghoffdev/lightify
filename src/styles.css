@@ -319,6 +319,16 @@ header h1 {
   color: var(--accent);
 }
 
+/* Sensor Buttons */
+.sensor-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sensor-buttons button {
+  flex: 1;
+}
+
 /* Dashboard */
 .dashboard {
   display: grid;
@@ -779,4 +789,326 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--text-secondary);
+}
+
+/* Mode Toggle */
+.mode-toggle {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.mode-btn:hover:not(:disabled) {
+  color: var(--text-secondary);
+  background: var(--bg-panel);
+}
+
+.mode-btn.active {
+  background: var(--bg-panel);
+  color: var(--success);
+  box-shadow: inset 0 0 10px var(--success-dim);
+}
+
+.mode-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Relay Setup */
+.relay-setup {
+  text-align: left;
+}
+
+.relay-setup .form-group {
+  margin-bottom: 1rem;
+}
+
+.relay-setup label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.relay-setup input[type="url"],
+.relay-setup input[type="password"],
+.relay-setup input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.relay-setup input:focus {
+  border-color: var(--accent);
+}
+
+.relay-setup input::placeholder {
+  color: var(--text-dim);
+}
+
+.relay-setup input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.relay-setup small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.relay-setup .button-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.relay-setup button {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.relay-setup button.secondary {
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.relay-setup button.secondary:hover:not(:disabled) {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.relay-setup button.danger {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.relay-setup button.danger:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.relay-setup button.primary {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  width: 100%;
+  padding: 0.75rem;
+}
+
+.relay-setup button.primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.relay-setup button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.relay-setup .status-message {
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.relay-setup .status-message.success {
+  color: var(--success);
+  border: 1px solid var(--success);
+  background: var(--success-dim);
+}
+
+.relay-setup .status-message.error {
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  background: rgba(255, 107, 53, 0.1);
+}
+
+.relay-setup .divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.relay-setup .divider::before,
+.relay-setup .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.relay-setup .divider span {
+  padding: 0 1rem;
+}
+
+.relay-setup .bridge-connect-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+/* Brightness Sensor */
+.brightness-sensor {
+  composes: panel;
+}
+
+/* Color Mode Toggle */
+.color-mode-toggle {
+  display: flex;
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.color-mode-btn {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-mode-btn:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.color-mode-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-panel);
+}
+
+.color-mode-btn.active {
+  background: var(--bg-panel);
+  color: var(--success);
+  box-shadow: inset 0 0 8px var(--success-dim);
+}
+
+/* Temperature Slider */
+.temp-slider {
+  width: 100%;
+  height: 24px;
+  -webkit-appearance: none;
+  background: linear-gradient(to right,
+    #ff8a00,    /* 1800K - candle */
+    #ffb46b,    /* 2700K - incandescent */
+    #ffd4a3,    /* 3500K - halogen */
+    #fff4e5,    /* 5000K - daylight */
+    #e8f4ff     /* 6500K - cool daylight */
+  );
+  border: 1px solid var(--border);
+  outline: none;
+  margin-top: 0.5rem;
+}
+
+.temp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 6px;
+  height: 28px;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-primary);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.temp-slider::-moz-range-thumb {
+  width: 6px;
+  height: 28px;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-primary);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Kelvin Value Display */
+.color-control label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kelvin-value {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+/* Temperature Presets */
+.temp-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.temp-preset-btn {
+  flex: 1;
+  min-width: calc(33% - 0.5rem);
+  padding: 0.5rem 0.25rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--bg-panel);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.temp-preset-btn:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.temp-preset-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
