@@ -17,7 +17,7 @@ interface BrightnessSensorProps {
   relayConfig: RelayConfig | null;
   bridgeIp: string | null;
   onConnect: () => void;
-  onConnectWithRelay: (config: RelayConfig) => void;
+  onConnectWithRelay: (config: RelayConfig) => Promise<void>;
   onSetConnectionMode: (mode: ConnectionMode) => void;
   onDisconnect: () => void;
 }

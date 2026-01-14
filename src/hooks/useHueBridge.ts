@@ -19,6 +19,7 @@ import {
   getLights,
   setMultipleLightsState,
   testRelayConnection,
+  getRelayBridgeIp,
 } from '../utils/hueApi';
 
 type ConnectionStatus = 'disconnected' | 'discovering' | 'waiting_button' | 'connected' | 'error';
@@ -32,7 +33,7 @@ interface UseHueBridgeReturn {
   connectionMode: ConnectionMode;
   relayConfig: RelayConfig | null;
   connect: () => Promise<void>;
-  connectWithRelay: (bridgeIp: string) => Promise<void>;
+  connectWithRelay: (config: RelayConfig) => Promise<void>;
   disconnect: () => void;
   refreshLights: () => Promise<void>;
   toggleLightSelection: (lightId: string) => void;
@@ -141,23 +142,31 @@ export function useHueBridge(): UseHueBridgeReturn {
     }
   }, []);
 
-  // Relay connect flow - requires bridge IP from relay config
-  const connectWithRelay = useCallback(async (bridgeIp: string) => {
-    if (!relayConfig) {
-      setError('Relay not configured');
-      setStatus('error');
-      return;
-    }
-
+  // Relay connect flow - accepts relay config and gets bridge IP from relay server
+  const connectWithRelay = useCallback(async (config: RelayConfig) => {
     try {
       setError(null);
+      setStatus('discovering');
+
+      // Save relay config
+      setRelayConfig(config);
+      saveRelayConfig(config);
+      setConnectionModeState('relay');
+      saveConnectionMode('relay');
+
+      // Get bridge IP from relay server
+      const bridgeIp = await getRelayBridgeIp(config);
+      if (!bridgeIp) {
+        throw new Error('Relay server has no bridge configured');
+      }
+
       setStatus('waiting_button');
 
       // Poll for button press via relay (try for 30 seconds)
       const maxAttempts = 30;
       for (let i = 0; i < maxAttempts; i++) {
         try {
-          const username = await createUser(bridgeIp, relayConfig);
+          const username = await createUser(bridgeIp, config);
           const newCredentials = { bridgeIp, username };
           saveCredentials(newCredentials);
           setCredentials(newCredentials);
@@ -179,7 +188,7 @@ export function useHueBridge(): UseHueBridgeReturn {
       setError(message);
       setStatus('error');
     }
-  }, [relayConfig]);
+  }, []);
 
   const disconnect = useCallback(() => {
     clearCredentials();

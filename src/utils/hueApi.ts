@@ -267,3 +267,22 @@ export async function testRelayConnection(relay: RelayConfig): Promise<boolean> 
     return false;
   }
 }
+
+/**
+ * Get bridge IP from relay server health endpoint
+ */
+export async function getRelayBridgeIp(relay: RelayConfig): Promise<string | null> {
+  try {
+    const relayUrl = relay.url.replace(/\/$/, '');
+    const response = await fetch(`${relayUrl}/relay/health`, {
+      headers: {
+        'X-Relay-Token': relay.token,
+      },
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.bridgeIp || null;
+  } catch {
+    return null;
+  }
+}

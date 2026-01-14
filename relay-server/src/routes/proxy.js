@@ -54,6 +54,7 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     bridgeConfigured: !!process.env.BRIDGE_IP,
+    bridgeIp: process.env.BRIDGE_IP || null,
     timestamp: new Date().toISOString(),
   });
 });
